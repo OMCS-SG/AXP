@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creative sync</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --b900:#00175A; --b800:#00358E; --b600:#006FCF; --b400:#4D9BDD; --b300:#99C5EC; --b200:#CCE2F5; --b100:#E6F1FB; --b50:#F4F8FD;
+  --ink:#152033; --muted:#5F6B7A; --faint:#8A95A3; --line:#DCE6F2; --track:#E7ECF2;
+  --bg:#F1F5FA; --card:#FFFFFF; --red:#C8102E; --red-bg:#FDECEF; --green:#1E7B4F; --green-bg:#E4F3EA;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Inter,"Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+
+/* header + tabs */
+.top{background:var(--b900);color:#fff}
+.in{max-width:1440px;margin:0 auto;padding-left:32px;padding-right:32px}
+.top .in{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-top:16px;padding-bottom:16px}
+.top h1{font-size:20px;font-weight:700;margin:0;letter-spacing:-.01em}
+.top .date{color:var(--b300);font-size:14px}
+.top .right{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;color:var(--b300)}
+.hbtn{text-decoration:none;display:inline-block;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500}
+.hbtn:hover{background:rgba(255,255,255,.1)}
+.hbtn.primary{background:var(--b600);border-color:var(--b600)}
+.hbtn.primary:hover{background:#0063B8}
+.tabs{background:var(--b600)}
+.tabs .in{display:flex;gap:4px;overflow-x:auto}
+.tab{color:#D7E8F8;padding:11px 14px 9px;font-size:13px;font-weight:500;border-bottom:3px solid transparent;white-space:nowrap}
+.tab:hover{color:#fff}
+.tab.on{color:#fff;border-bottom-color:#fff}
+
+.wrap{padding-top:24px;padding-bottom:48px}
+.banner{font-size:12.5px;padding:9px 14px;border-radius:6px;margin-bottom:18px;background:var(--b100);color:var(--b900);border:1px solid var(--b200)}
+.banner.err{background:var(--red-bg);color:var(--red);border-color:#F6C6CF}
+.section-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--b800);margin:0 0 10px}
+
+/* summary row */
+.summary{display:grid;grid-template-columns:1.3fr repeat(4,1fr);background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:26px}
+.sum{padding:16px 20px;border-left:1px solid var(--line)}
+.sum:first-child{border-left:0;background:var(--b600);color:#fff}
+.sum .k{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sum:first-child .k{color:var(--b200)}
+.sum .v{font-size:28px;font-weight:700;line-height:1.15;margin-top:4px;color:var(--b900)}
+.sum:first-child .v{color:#fff}
+.sum .v small{font-size:14px;font-weight:500;color:var(--faint)}
+.sum .s{font-size:11.5px;color:var(--faint);margin-top:2px}
+.sum:first-child .s{color:var(--b200)}
+.sum .mini{height:5px;background:rgba(255,255,255,.25);border-radius:3px;margin-top:8px;overflow:hidden}
+.sum .mini>div{height:100%;background:#fff;border-radius:3px}
+@media (max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}.sum{border-top:1px solid var(--line)}}
+
+/* project cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;margin-bottom:26px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;text-align:left;width:100%;display:flex;flex-direction:column;justify-content:flex-start}
+.card:hover{border-color:var(--b300)}
+.card.sel{border-color:var(--b600);box-shadow:0 0 0 1px var(--b600)}
+.card .ch{background:var(--b100);padding:11px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.card .name{font-size:14px;font-weight:600;color:var(--b900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.days{font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--card);color:var(--b800);white-space:nowrap;border:1px solid var(--b200)}
+.days.warn{background:var(--red-bg);color:var(--red);border-color:#F6C6CF}
+.card .cb{padding:14px 16px 14px}
+.card .pct{display:flex;align-items:baseline;gap:8px}
+.card .pct b{font-size:30px;font-weight:700;color:var(--b600);line-height:1;letter-spacing:-.02em}
+.card .pct span{font-size:12px;color:var(--muted)}
+.bar{height:6px;background:var(--track);border-radius:3px;overflow:hidden;margin-top:10px}
+.bar>div{height:100%;background:var(--b600);border-radius:3px}
+.card .meta{font-size:11.5px;color:var(--faint);margin-top:10px;line-height:1.5}
+.card .meta .r{color:var(--red);font-weight:500}
+
+/* panels */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
+@media (max-width:1100px){.layout{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.ph{background:var(--b100);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;justify-content:space-between;align-items:center}
+.ph h2{margin:0;font-size:13.5px;font-weight:600;color:var(--b900)}
+.ph span{font-size:11.5px;color:var(--muted)}
+.pb{padding:0 16px}
+
+.thead,.item{display:grid;grid-template-columns:minmax(0,1.3fr) 118px minmax(0,1.7fr) 64px;gap:16px;align-items:center}
+.thead{background:var(--b50);border-bottom:1px solid var(--line);padding:7px 16px;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.thead div:last-child{text-align:right}
+.item{padding:11px 0;border-top:1px solid var(--track)}
+.item:first-child{border-top:0}
+.item .nm{font-weight:500;font-size:13.5px}
+.item .note{font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:4px;white-space:nowrap}
+.chip.creative{background:var(--b600);color:#fff}
+.chip.content{background:var(--b800);color:#fff}
+.chip.client{background:var(--b200);color:var(--b900)}
+.chip.approved{background:var(--green-bg);color:var(--green)}
+.chip.notstarted,.chip.hold{background:var(--track);color:var(--muted)}
+.segs{display:flex;gap:2px}
+.segs span{flex:1;height:7px;border-radius:2px;background:var(--track)}
+.segs .d{background:var(--b600)}
+.segs .p{background:var(--b900)}
+.segs .n{background:var(--b300)}
+.segs .o{background:var(--red)}
+.segs.ok span{background:var(--green)}
+.rl{font-size:11px;color:var(--faint);margin-top:5px}
+.rl .r{color:var(--red);font-weight:500}
+.due{font-size:12px;color:var(--muted);text-align:right}
+.due.late{color:var(--red);font-weight:600}
+@media (max-width:760px){.thead{display:none}.item{grid-template-columns:1fr 1fr}.due{text-align:left}}
+
+.li{padding:10px 0;border-top:1px solid var(--track);font-size:13px}
+.li:first-child{border-top:0}
+.li .m{font-size:11px;color:var(--faint);margin-top:2px}
+.li .m .r{color:var(--red);font-weight:500}
+.li.done .t{color:var(--faint);text-decoration:line-through}
+.box{display:inline-block;width:13px;height:13px;border:1.5px solid var(--b300);border-radius:3px;margin-right:9px;vertical-align:-2px}
+.li.done .box{background:var(--b600);border-color:var(--b600)}
+.indent{margin-left:22px}
+.ft{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:3px;background:var(--b100);color:var(--b800);margin-bottom:4px}
+.ft.r{background:var(--red-bg);color:var(--red)}
+.empty{font-size:12px;color:var(--faint);padding:12px 0}
+.dh{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--b800);padding:12px 0 2px;border-top:1px solid var(--line)}
+.dh:first-child{border-top:0;padding-top:10px}
+.dh + .li{border-top:0}
+.more{display:block;width:100%;text-align:left;font-size:12px;font-weight:600;color:var(--b600);padding:10px 0 12px;border-top:1px solid var(--track)}
+.more:hover{text-decoration:underline}
+
+.key{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--faint);margin-top:2px}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{width:14px;height:6px;border-radius:2px;display:inline-block}
+
+</style>
+</head>
+<body>
+<div class="top"><div class="in">
+  <h1 id="title">Creative sync</h1>
+  <span class="date" id="today"></span>
+  <div class="right">
+    <span id="stamp"></span>
+    <button class="hbtn" id="refresh" type="button">Refresh</button>
+    <a class="hbtn primary" id="editBtn" href="#" target="_blank" rel="noopener">Edit in Google Sheets</a>
+  </div>
+</div></div>
+<nav class="tabs"><div class="in" id="chips"></div></nav>
+
+<div class="in wrap">
+  <div id="banners"></div>
+  <div class="summary" id="strip"></div>
+  <div class="section-title">Projects</div>
+  <div class="cards" id="projects"></div>
+  <div class="layout">
+    <main>
+      <div class="section-title">Deliverables</div>
+      <div id="items"></div>
+      <div class="key">
+        <span><i style="background:var(--b600)"></i>Sent</span>
+        <span><i style="background:var(--b300)"></i>In progress</span>
+        <span><i style="background:var(--b900)"></i>Paid extra round</span>
+        <span><i style="background:var(--red)"></i>Over budget, unpaid</span>
+        <span><i style="background:var(--green)"></i>Approved</span>
+      </div>
+    </main>
+    <aside>
+      <div class="section-title">Today's sync</div>
+      <section class="panel" id="todayPanel"></section>
+      <section class="panel" id="upcomingPanel"></section>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* ============================ SETTINGS ============================
+   sheetLink: paste your Google Sheet's link (copy it from the address bar).
+   The Sheet must be shared as "Anyone with the link: Viewer".
+   Leave it empty to see demo data.                                      */
+const CONFIG = {
+  title: "Creative sync",
+  sheetLink: "https://docs.google.com/spreadsheets/d/1Pb8ygZ96rGpFzHCcHWpli_l54UDn0DzPti2Ms4UbHtU/edit",
+  tabNames: { projects: "Projects", items: "Items", today: "Today" },
+  dateOrder: "DMY",        // how the Sheet shows dates like 09/10/2026: "DMY" (Singapore) or "MDY" (US)
+  defaultRounds: 6,        // used when "Rounds included" is blank
+  upcomingDays: 14,       // Upcoming panel shows tasks dated within this many days ahead
+  approvalShare: 0.2,      // share of an item's % held back until client approval (0.2 = 80% max until approved)
+  refreshMinutes: 2
+};
+/* ================================================================== */
+
+const FIELDS = {
+  projects: { id:["projectid","id","code"], name:["projectname","name"], client:["client"], deadline:["deadline"], linked:["linkedto","linked","linkedprojects"], active:["active"] },
+  items:    { project:["projectid","project"], item:["item","deliverable"], status:["status"], sent:["versionssent","versions"], included:["roundsincluded","included"], extra:["extraroundspaid","extrapaid","extrarounds"], due:["duedate","due"], note:["note","notes"] },
+  today:    { date:["date"], project:["projectid","project"], item:["item"], task:["task"], owner:["owner","assignee","who"], done:["done"] },
+};
+const HEADERS = {
+  projects:["Project ID","Project name","Client","Deadline","Linked to","Active"],
+  items:["Project ID","Item","Status","Versions sent","Rounds included","Extra rounds paid","Due date","Note"],
+  today:["Date","Project ID","Item","Task","Owner","Done"]
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = s => String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+const yes = s => /^(y|yes|true|1|done|x|✓)$/i.test(String(s||"").trim());
+const int = (s, d) => { const n = parseInt(String(s ?? "").trim(), 10); return isNaN(n) ? d : n; };
+
+function toObjects(headers, rows, map){
+  const heads = headers.map(norm), idx = {};
+  for(const [key, aliases] of Object.entries(map)){
+    let i = -1;
+    for(const a of aliases){ i = heads.indexOf(a); if(i>=0) break; }
+    if(i<0) for(const a of aliases){ i = heads.findIndex(h => h.includes(a)); if(i>=0) break; }
+    idx[key] = i;
+  }
+  return rows.filter(r => r.some(c => String(c ?? "").trim()!==""))
+    .map(r => { const o={}; for(const k in idx) o[k] = idx[k]>=0 ? String(r[idx[k]] ?? "").trim() : ""; return o; });
+}
+
+function parseDate(s){
+  if(!s) return null; s=String(s).trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if(m) return new Date(+m[1], m[2]-1, +m[3], +(m[4]||0), +(m[5]||0));
+  m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+  if(m){ const a=+m[1], b=+m[2], y=+m[3];
+    return CONFIG.dateOrder==="MDY" ? new Date(y,a-1,b,+(m[4]||0),+(m[5]||0)) : new Date(y,b-1,a,+(m[4]||0),+(m[5]||0)); }
+  const t = Date.parse(s); return isNaN(t) ? null : new Date(t);
+}
+const iso = d => d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` : "";
+const midnight = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const daysFrom = d => Math.round((midnight(d) - midnight(new Date())) / 86400000);
+const fmtDate = d => d ? d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}) : "";
+
+function statusKey(s){
+  s = norm(s);
+  if(s.includes("approv")) return "approved";
+  if(s.includes("client")) return "client";
+  if(s.includes("creative")) return "creative";
+  if(s.includes("content")) return "content";
+  if(s.includes("hold")) return "hold";
+  return "notstarted";
+}
+const STATUS_LABEL = {approved:"Approved", client:"With client", creative:"With creative", content:"With content", hold:"On hold", notstarted:"Not started"};
+
+/* ---------- demo data (dates relative to today) ---------- */
+function demoTabs(){
+  const d = n => { const x=new Date(); x.setDate(x.getDate()+n); return iso(x); };
+  const tab = (k, rows) => ({name:k, headers:HEADERS[k], rows, version:"demo"});
+  return {
+    projects: tab("projects",[
+      ["P01","Brand X Q4 launch","Brand X",d(9),"P02","Yes"],
+      ["P02","Brand X CNY teaser","Brand X",d(24),"P01","Yes"],
+      ["P03","Fintech Y app refresh","Fintech Y",d(3),"","Yes"]]),
+    items: tab("items",[
+      ["P01","Key visual","With client","4","6","0",d(6),"Logo lock-up agreed"],
+      ["P01","Social cutdowns","With creative","8","6","2",d(5),"Client bought 2 extra rounds"],
+      ["P01","EDM","With creative","1","6","0",d(8),""],
+      ["P01","OOH","Approved","3","6","0",d(-2),""],
+      ["P02","Teaser storyboard","With content","2","6","0",d(14),"Copy rewrite in progress"],
+      ["P02","Teaser key art","Not started","0","6","0",d(20),"Waits on P01 key visual"],
+      ["P03","App store screenshots","With client","6","6","0",d(2),""],
+      ["P03","Launch banner set","With creative","8","6","0",d(1),"R7 not yet agreed with client"],
+      ["P03","Onboarding screens","Approved","2","6","0",d(-5),""]]),
+    today: tab("today",[
+      [d(0),"P01","Social cutdowns","R8: swap end frame, shorten 15s version","Mei","No"],
+      [d(0),"P01","EDM","R1: hero image and CTA colour","Jun","Yes"],
+      [d(0),"P03","Launch banner set","R7: resize set to 6 formats","Arif","No"],
+      [d(-1),"P02","Teaser storyboard","Frame 4 alt option","Mei","No"],
+      [d(1),"P01","Key visual","R4: client feedback on logo size","Mei","No"],
+      [d(1),"P03","App store screenshots","Brief: localise for 3 markets","Arif","No"],
+      [d(3),"P02","Teaser key art","Brief: first concept routes","Jun","No"],
+      [d(6),"P01","EDM","R2: update offer copy","Jun","No"],
+      [d(25),"P02","Teaser storyboard","Brief: final animatic","Mei","No"]])
+  };
+}
+
+/* ---------- model ---------- */
+let TABS = null, DATA = null, SEL = "all", ERRORS = [], IS_DEMO = false, LAST = null, UP_ALL = false;
+
+function buildModel(tabs){
+  const raw = {};
+  for(const k of Object.keys(FIELDS)) raw[k] = tabs[k] ? toObjects(tabs[k].headers, tabs[k].rows, FIELDS[k]) : [];
+  const projects = new Map(), inactive = new Set();
+  raw.projects.forEach(p => {
+    if(!p.id && !p.name) return;
+    const id = p.id || p.name;
+    if(p.active && !yes(p.active)){ inactive.add(norm(id)); return; }
+    projects.set(id, {id, name:p.name||id, client:p.client, deadline:parseDate(p.deadline),
+      linked:(p.linked||"").split(/[,;]/).map(s=>s.trim()).filter(Boolean), items:[]});
+  });
+  const findProject = key => {
+    if(!key) return null;
+    if(projects.has(key)) return projects.get(key);
+    const k = norm(key);
+    for(const p of projects.values()) if(norm(p.id)===k || norm(p.name)===k) return p;
+    for(const p of projects.values()) if(k.startsWith(norm(p.id)) && !/^[0-9]/.test(k.slice(norm(p.id).length))) return p;
+    for(const p of projects.values()) if(norm(p.name).length>3 && k.includes(norm(p.name))) return p;
+    return null;
+  };
+  raw.items.forEach(r => {
+    if(!r.item) return;
+    let p = findProject(r.project);
+    if(!p){ if(inactive.has(norm(r.project))) return;
+      const id = r.project || "Unassigned"; p = {id, name:id, client:"", deadline:null, linked:[], items:[]}; projects.set(id,p); }
+    const included = int(r.included, CONFIG.defaultRounds);
+    const extra = Math.max(0, int(r.extra, 0));
+    const budget = included + extra;
+    const sent = Math.max(0, int(r.sent, 0));
+    const revs = Math.max(0, sent - 1);
+    const overUnpaid = Math.max(0, revs - budget);
+    const st = statusKey(r.status);
+    const progress = st==="approved" ? 1 : (Math.min(sent, budget + 1) / (budget + 1)) * (1 - CONFIG.approvalShare);
+    p.items.push({...r, st, included, extra, budget, sent, revs, overUnpaid, progress, dueD:parseDate(r.due), project:p});
+  });
+  for(const p of projects.values()){
+    const n = p.items.length;
+    p.progress = n ? p.items.reduce((a,i)=>a+i.progress,0)/n : 0;
+    p.approved = p.items.filter(i=>i.st==="approved").length;
+    p.extraPaid = p.items.reduce((a,i)=>a+i.extra,0);
+    p.overUnpaid = p.items.reduce((a,i)=>a+i.overUnpaid,0);
+  }
+  const tasks = raw.today.map(t => ({...t, d:parseDate(t.date), p:findProject(t.project), isDone:yes(t.done)}))
+    .filter(t => t.d && t.task && !(t.p===null && inactive.has(norm(t.project))));
+  const today = tasks.filter(t => daysFrom(t.d)===0 || (daysFrom(t.d)<0 && !t.isDone));
+  const upcoming = tasks.filter(t => daysFrom(t.d)>0 && !t.isDone);
+  return {projects:[...projects.values()], today, upcoming};
+}
+
+/* ---------- render ---------- */
+function daysLabel(d){
+  if(!d) return {t:"No deadline", warn:false};
+  const n = daysFrom(d);
+  if(n<0) return {t:`${-n}d overdue`, warn:true};
+  if(n===0) return {t:"Due today", warn:true};
+  return {t:`${n} day${n===1?"":"s"} left`, warn:n<=3};
+}
+
+function rounds(i){
+  const working = i.st==="creative" || i.st==="content";
+  const nextOver = working && i.sent > i.budget;
+  const segs = [];
+  const slots = 1 + i.budget + i.overUnpaid + (nextOver ? 1 : 0);
+  for(let k=0;k<slots;k++){
+    let c = "";
+    if(k < i.sent) c = k>i.budget ? "o" : k>i.included ? "p" : "d";
+    else if(k===i.sent && working) c = k>i.budget ? "o" : "n";
+    segs.push(`<span class="${c}"></span>`);
+  }
+  let label;
+  if(i.st==="approved") label = `Approved after ${i.revs ? "R"+i.revs : "first draft"}`;
+  else if(i.sent===0) label = "Not sent yet";
+  else if(i.sent===1) label = `First draft sent · ${i.budget} rounds left`;
+  else label = `R${i.revs} of ${i.budget} sent`;
+  if(i.st!=="approved" && i.extra) label += ` · ${i.extra} paid extra`;
+  if(i.st!=="approved" && (i.overUnpaid || nextOver)) label += ` · <span class="r">over budget, unpaid</span>`;
+  return `<div class="segs ${i.st==="approved"?"ok":""}">${segs.join("")}</div><div class="rl">${label}</div>`;
+}
+
+function itemRow(i){
+  const n = i.dueD ? daysFrom(i.dueD) : null;
+  const late = n!==null && n<0 && i.st!=="approved";
+  const dueTxt = !i.dueD ? "–" : late ? `${-n}d late` : (n===0 && i.st!=="approved") ? "Today" : fmtDate(i.dueD);
+  return `<div class="item">
+    <div><div class="nm">${esc(i.item)}</div>${i.note?`<div class="note" title="${esc(i.note)}">${esc(i.note)}</div>`:""}</div>
+    <div><span class="chip ${i.st}">${STATUS_LABEL[i.st]}</span></div>
+    <div>${rounds(i)}</div>
+    <div class="due ${late?"late":""}">${dueTxt}</div>
+  </div>`;
+}
+
+function render(){
+  $("title").textContent = CONFIG.title;
+  document.title = CONFIG.title;
+  $("today").textContent = new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+  $("stamp").textContent = LAST ? "Updated " + LAST.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}) : "";
+
+  let b = "";
+  if(IS_DEMO) b += `<div class="banner">Demo data. Paste your Google Sheet link into the settings at the top of index.html to go live.</div>`;
+  if(ERRORS.length) b += `<div class="banner err">${ERRORS.map(esc).join(" ")}</div>`;
+  $("banners").innerHTML = b;
+  if(!DATA) return;
+
+  const {projects} = DATA;
+  if(SEL!=="all" && !projects.some(p=>p.id===SEL)) SEL="all";
+  const shown = SEL==="all" ? projects : projects.filter(p=>p.id===SEL);
+  const ids = new Set(shown.map(p=>p.id));
+  const items = shown.flatMap(p=>p.items);
+
+  $("chips").innerHTML =
+    `<button class="tab ${SEL==="all"?"on":""}" data-sel="all" type="button">All projects</button>` +
+    projects.map(p=>`<button class="tab ${SEL===p.id?"on":""}" data-sel="${esc(p.id)}" type="button">${esc(p.name)}</button>`).join("");
+
+  const cnt = k => items.filter(i=>i.st===k).length;
+  const overall = items.length ? Math.round(items.reduce((a,i)=>a+i.progress,0)/items.length*100) : 0;
+  $("strip").innerHTML = `
+    <div class="sum"><div class="k">${SEL==="all"?"Overall progress":"Project progress"}</div><div class="v">${overall}%</div>
+      <div class="mini"><div style="width:${overall}%"></div></div></div>
+    <div class="sum"><div class="k">With creative</div><div class="v">${cnt("creative")}</div><div class="s">waiting on creative</div></div>
+    <div class="sum"><div class="k">With content</div><div class="v">${cnt("content")}</div><div class="s">waiting on content</div></div>
+    <div class="sum"><div class="k">With client</div><div class="v">${cnt("client")}</div><div class="s">waiting on client</div></div>
+    <div class="sum"><div class="k">Approved</div><div class="v">${cnt("approved")}<small> / ${items.length}</small></div><div class="s">signed off by client</div></div>`;
+
+  $("projects").innerHTML = shown.map(p => {
+    const dl = daysLabel(p.deadline), pct = Math.round(p.progress*100);
+    const meta = [esc(p.client||""), p.deadline ? "due "+fmtDate(p.deadline) : ""].filter(Boolean);
+    if(p.extraPaid) meta.push(`${p.extraPaid} paid extra round${p.extraPaid===1?"":"s"}`);
+    if(p.overUnpaid) meta.push(`<span class="r">${p.overUnpaid} over budget</span>`);
+    const linked = p.linked.map(l=>projects.find(x=>x.id===l)).filter(Boolean);
+    if(linked.length) meta.push("linked to " + linked.map(x=>esc(x.name)).join(", "));
+    return `<button class="card ${SEL===p.id?"sel":""}" data-sel="${esc(p.id)}" type="button">
+      <div class="ch"><span class="name">${esc(p.name)}</span><span class="days ${dl.warn?"warn":""}">${dl.t}</span></div>
+      <div class="cb">
+        <div class="pct"><b>${pct}%</b><span>${p.approved} of ${p.items.length} approved</span></div>
+        <div class="bar"><div style="width:${pct}%"></div></div>
+        <div class="meta">${meta.join(" · ")}</div>
+      </div>
+    </button>`;
+  }).join("");
+
+  const order = {creative:0, content:1, client:2, notstarted:3, hold:4, approved:5};
+  const sortItems = arr => [...arr].sort((a,b)=> order[a.st]-order[b.st] || (a.dueD||Infinity)-(b.dueD||Infinity));
+  $("items").innerHTML = shown.map(p => `<section class="panel">
+      <div class="ph"><h2>${esc(p.name)}</h2><span>${p.items.length} item${p.items.length===1?"":"s"}</span></div>
+      <div class="thead"><div>Deliverable</div><div>With</div><div>Rounds</div><div>Due</div></div>
+      <div class="pb">${p.items.length ? sortItems(p.items).map(itemRow).join("") : `<div class="empty">No items yet. Add rows in the Items tab of the Sheet.</div>`}</div>
+    </section>`).join("") || `<section class="panel"><div class="pb"><div class="empty">No active projects. Add one in the Projects tab of the Sheet.</div></div></section>`;
+
+  const todays = DATA.today.filter(t => SEL==="all" || (t.p && ids.has(t.p.id)))
+    .sort((a,b)=>a.isDone-b.isDone || (a.d-b.d));
+  $("todayPanel").innerHTML = `<div class="ph"><h2>Today</h2><span>${todays.filter(t=>!t.isDone).length} open</span></div><div class="pb">` +
+    (todays.length ? todays.map(t => {
+      const carried = daysFrom(t.d)<0;
+      return `<div class="li ${t.isDone?"done":""}"><span class="box"></span><span class="t">${esc(t.task)}</span>
+        <div class="m indent">${esc(t.item||(t.p?t.p.name:t.project))}${t.owner?" · "+esc(t.owner):""}${carried?` · <span class="r">from ${fmtDate(t.d)}</span>`:""}</div></div>`;
+    }).join("") : `<div class="empty">Nothing scheduled for today.</div>`) + `</div>`;
+
+  const W = CONFIG.upcomingDays;
+  const ups = DATA.upcoming.filter(t => SEL==="all" || (t.p && ids.has(t.p.id))).sort((a,b)=>a.d-b.d);
+  const near = UP_ALL ? ups : ups.filter(t => daysFrom(t.d) <= W), later = ups.length - ups.filter(t => daysFrom(t.d) <= W).length;
+  const dayLabel = d => { const n = daysFrom(d); return n===1 ? "Tomorrow" : d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}); };
+  let html = "", lastKey = "";
+  near.forEach(t => {
+    const k = iso(t.d);
+    if(k!==lastKey){ html += `<div class="dh">${dayLabel(t.d)}</div>`; lastKey = k; }
+    html += `<div class="li"><span class="t">${esc(t.task)}</span>
+      <div class="m">${esc(t.item||(t.p?t.p.name:t.project))}${t.owner?" · "+esc(t.owner):""}</div></div>`;
+  });
+  $("upcomingPanel").innerHTML = `<div class="ph"><h2>Upcoming</h2><span>${UP_ALL && later ? "all dates" : `next ${W} days`}</span></div><div class="pb">` +
+    (html || `<div class="empty">Nothing planned in the next ${W} days.</div>`) +
+    (later ? `<button type="button" class="more" id="upToggle">${UP_ALL ? `Show next ${W} days only` : `+ ${later} more task${later===1?"":"s"} after that`}</button>` : "") + `</div>`;
+
+}
+
+/* ---------- loading ---------- */
+function parseCSV(text){
+  const rows=[]; let row=[], f="", q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(f); f=""; }
+    else if(c==='\n'){ row.push(f); rows.push(row); row=[]; f=""; }
+    else if(c!=='\r') f+=c;
+  }
+  if(f!==""||row.length){ row.push(f); rows.push(row); }
+  return rows;
+}
+
+function sheetId(link){
+  const m = String(link||"").match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]{20,})/);
+  return m ? m[1] : (/^[a-zA-Z0-9_-]{30,}$/.test(String(link||"").trim()) ? String(link).trim() : null);
+}
+
+async function fetchTab(id, name){
+  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(name)}&t=${Date.now()}`;
+  const r = await fetch(url, {cache:"no-store"});
+  if(!r.ok) throw new Error("HTTP " + r.status);
+  const t = await r.text();
+  if(/^\s*<(!doctype|html)/i.test(t)) throw new Error("not shared");
+  const rows = parseCSV(t);
+  if(!rows.length) return {name, headers:[], rows:[]};
+  return {name, headers: rows[0].map(h=>h.trim()), rows: rows.slice(1)};
+}
+
+async function load(){
+  const id = sheetId(CONFIG.sheetLink);
+  IS_DEMO = !CONFIG.sheetLink;
+  const edit = $("editBtn");
+  if(IS_DEMO){ edit.style.display="none"; TABS = demoTabs(); DATA = buildModel(TABS); LAST = new Date(); render(); return; }
+  edit.href = id ? `https://docs.google.com/spreadsheets/d/${id}/edit` : CONFIG.sheetLink;
+  if(!id){ ERRORS = ["The sheetLink in the settings doesn't look like a Google Sheets link. Copy it from the browser's address bar while the Sheet is open."]; render(); return; }
+  const keys = Object.keys(CONFIG.tabNames);
+  const res = await Promise.allSettled(keys.map(k => fetchTab(id, CONFIG.tabNames[k])));
+  const next = {}, failed = [];
+  res.forEach((r,n) => {
+    const k = keys[n];
+    if(r.status==="fulfilled") next[k] = r.value;
+    else { failed.push(CONFIG.tabNames[k]); next[k] = TABS && TABS[k] ? TABS[k] : {name:k, headers:[], rows:[]}; }
+  });
+  ERRORS = [];
+  if(failed.length===keys.length) ERRORS.push(`Couldn't read the Sheet. Check it's shared as "Anyone with the link: Viewer" (Share button, top right of the Sheet).` + (TABS ? " Showing the last data that loaded." : ""));
+  else if(failed.length) ERRORS.push(`Couldn't read the ${failed.join(", ")} tab${failed.length>1?"s":""}. Check the tab name matches exactly.`);
+  TABS = next; DATA = buildModel(TABS);
+  if(failed.length < keys.length) LAST = new Date();
+  render();
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  if(e.target.closest("#upToggle")){ UP_ALL = !UP_ALL; render(); return; }
+  const t = e.target.closest("[data-sel]");
+  if(t){ const s = t.getAttribute("data-sel"); SEL = (SEL===s && s!=="all") ? "all" : s; render(); }
+});
+document.addEventListener("keydown", e => {
+  if(!DATA || e.target.closest("input,textarea,select")) return;
+  const order = ["all", ...DATA.projects.map(p=>p.id)];
+  const i = order.indexOf(SEL);
+  if(e.key==="ArrowRight"){ SEL = order[(i+1)%order.length]; render(); }
+  if(e.key==="ArrowLeft"){ SEL = order[(i-1+order.length)%order.length]; render(); }
+});
+document.addEventListener("visibilitychange", () => { if(!document.hidden) load(); });
+$("refresh").addEventListener("click", load);
+load();
+setInterval(load, Math.max(1, CONFIG.refreshMinutes) * 60000);
+</script>
+</body>
+</html>
